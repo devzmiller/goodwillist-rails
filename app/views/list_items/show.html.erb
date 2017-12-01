@@ -1,0 +1,11 @@
+<ul>
+  <% @list_item.find_items_by_keyword.each do |item| %>
+    <li>
+      <%= link_to item.title, item.url %>
+      Condition: <%= item.condition %>
+      <% if item.image_url %>
+        <%= image_tag(item.image_url) %>
+      <% end %>
+    </li>
+  <% end %>
+</ul>

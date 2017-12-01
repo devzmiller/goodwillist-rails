@@ -1,7 +1,7 @@
 <ul>
   <% @list_items.each do |item| %>
   <li>
-    <%= item.keywords %>
+    <%= link_to item.keywords, list_item_path(item) %>
     <% if item.find_items_by_keyword.length > 0 %>
       - Available items!
     <% end %>
