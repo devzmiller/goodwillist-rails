@@ -2,6 +2,9 @@
   <% @list_items.each do |item| %>
   <li>
     <%= item.keywords %>
+    <% if item.find_items_by_keyword.length > 0 %>
+      - Available items!
+    <% end %>
   </li>
   <% end %>
 </ul>

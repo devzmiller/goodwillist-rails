@@ -1,6 +1,6 @@
 class ListItem < ApplicationRecord
 
-  def self.find_items_by_keyword(keyword)
-    InventoryItem.where("title like ?", '%' + keyword + '%')
+  def find_items_by_keyword
+    InventoryItem.where("title like ?", '%' + self.keywords + '%')
   end
 end
