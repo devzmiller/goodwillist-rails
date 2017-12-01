@@ -3,7 +3,7 @@ class InventoryItem < ApplicationRecord
   def self.get_ebay_inventory
     url = "http://svcs.ebay.com/services/search/FindingService/v1?OPERATION-NAME=findItemsIneBayStores&SERVICE-VERSION=1.13.0&SECURITY-APPNAME=#{ENV['EBAY_ID']}&GLOBAL-ID=EBAY-US&RESPONSE-DATA-FORMAT=JSON&REST-PAYLOAD&storeName=seattlegoodwillbooks&paginationInput.entriesPerPage=100"
     response = RestClient.get(url)
-    JSON.parse(response.body, symbolize_names: true)
+    p JSON.parse(response.body, symbolize_names: true)
   end
 
   def self.parse_json_item(json_item)
