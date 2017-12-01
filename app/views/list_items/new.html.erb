@@ -1,0 +1,5 @@
+<%= form_for @list_item do |f| %>
+  <%= render "shared/errors", object: @list_item %>
+  <%= f.text_field :field %>
+
+<% end %>
