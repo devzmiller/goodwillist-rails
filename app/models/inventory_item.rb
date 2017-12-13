@@ -39,15 +39,21 @@ class InventoryItem < ApplicationRecord
   end
 
   def self.parse_json_item(json_item)
+    p json_item
     if json_item[:galleryURL] == nil
       image_url = nil
     else
       image_url = json_item[:galleryURL][0]
     end
+    if json_item[:condition] == nil
+      condition = nil
+    else
+      condition = json_item[:condition][0][:conditionDisplayName][0]
+    end
     InventoryItem.find_or_create_by(title: json_item[:title][0],
     url: json_item[:viewItemURL][0],
     image_url: image_url,
-    condition: json_item[:condition][0][:conditionDisplayName][0],
+    condition: condition,
     ebay_id: json_item[:itemId][0])
   end
 
