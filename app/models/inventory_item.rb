@@ -12,6 +12,8 @@ class InventoryItem < ApplicationRecord
   # Method which initiates one query. Iterates over pages.
   # Time.now.utc.strftime("%FT%R%LZ") - gets the ebay required UTC format
   # Time.now + (60 * 60 * 48) - gets 48 hours ahead (Time math works in seconds)
+  # 101030 in db vs 104,336 shown on ebay. not sure what it missed.
+
   def self.get_ebay_items
     uri = Addressable::URI.parse("http://svcs.ebay.com/services/search/FindingService/v1")
     query = {"OPERATION-NAME"=>"findItemsIneBayStores",
