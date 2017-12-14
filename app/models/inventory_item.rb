@@ -10,8 +10,9 @@ class InventoryItem < ApplicationRecord
 
   # Method which initiates the retrieval of ebay inventory.
   # Method which initiates one query. Iterates over pages.
-
-  def self.ebay_query
+  # Time.now.utc.strftime("%FT%R%LZ") - gets the ebay required UTC format
+  # Time.now + (60 * 60 * 48) - gets 48 hours ahead (Time math works in seconds)
+  def self.get_ebay_items
     uri = Addressable::URI.parse("http://svcs.ebay.com/services/search/FindingService/v1")
     query = {"OPERATION-NAME"=>"findItemsIneBayStores",
       "SERVICE-VERSION"=>"1.13.0",
@@ -20,13 +21,31 @@ class InventoryItem < ApplicationRecord
       "RESPONSE-DATA-FORMAT"=>"JSON",
       "REST-PAYLOAD"=>nil,
       "storeName"=>"seattlegoodwillbooks",
-      "itemFilter.name"=>"EndTimeTo",
-      "itemFilter.value"=>"2017-12-14T19:09:02.768Z",
+      "itemFilter(0).name"=>"EndTimeFrom",
+      "itemFilter(0).value"=>(Time.now.utc + 60 * 5).strftime("%FT%T.%LZ"),
+      "itemFilter(1).name"=>"EndTimeTo",
+      "itemFilter(1).value"=>(Time.now.utc + (60 * 60 * 72)).strftime("%FT%T.%LZ"),
       "paginationInput.pageNumber"=>"1"}
+      end_time_from = Time.now.utc + (60 * 5)
+      items = []
+      until end_time_from >= Time.now.utc + (60 * 60 * 24 * 30)
+        p end_time_from
+        end_time_to = end_time_from + (60 * 60 * 50)
+        query["itemFilter(0).value"] = end_time_from.strftime("%FT%T.%LZ")
+        query["itemFilter(1).value"] = end_time_to.strftime("%FT%T.%LZ")
+        items.concat(ebay_query(uri, query))
+        end_time_from = end_time_to
+      end
+      items
+    end
+
+
+  def self.ebay_query(uri, query)
     uri.query_values = query
     response = RestClient.get(uri.to_str)
     json = JSON.parse(response.body, symbolize_names: true)
     page_count = json[:findItemsIneBayStoresResponse][0][:paginationOutput][0][:totalPages][0].to_i
+    p page_count
     items = json[:findItemsIneBayStoresResponse][0][:searchResult][0][:item] #this is an array of hashes, one for each items
     (2..page_count).each do |page|
       query["paginationInput.pageNumber"] = page
@@ -39,7 +58,6 @@ class InventoryItem < ApplicationRecord
   end
 
   def self.parse_json_item(json_item)
-    p json_item
     if json_item[:galleryURL] == nil
       image_url = nil
     else
